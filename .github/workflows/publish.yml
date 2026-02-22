@@ -1,0 +1,28 @@
+name: Publish lua-polycall to LuaRocks
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to LuaRocks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lua and LuaRocks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.4 luarocks
+
+      - name: Verify rockspec
+        run: luarocks lint lua-polycall-1.0-1.rockspec
+
+      - name: Upload to LuaRocks
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+        run: |
+          luarocks upload lua-polycall-1.0-1.rockspec --api-key=$LUAROCKS_API_KEY
